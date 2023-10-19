@@ -17,13 +17,25 @@ typedef struct{
     char descricao[MAX_DESCR]
 }processo;
 
-int prior_tempo, indice_atual = 0;
-processo lista[TAM_MAX];
+int prior_tempo, //indica se está ordenado por prioridade(0) ou horario de chegada(1)
+    tamanho = 0; //numero de processos na lista
+processo lista[TAM_MAX];//lista de processos
 
-void ler_comando(){
-    char comando[10] = {0};
-    scanf(" %s", comando);
-}
+/* funções do Victor e do Giordano
+-ler_comando();
+-ordenar();
+-add();
+*/
+
+/* funções do Maicon e do Karl
+-exec();
+-change();
+*/
+
+/* funções do Paulo e do Catuzzi
+-print();
+-next();
+*/
 
 int main(void){
 
