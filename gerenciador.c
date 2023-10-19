@@ -35,7 +35,7 @@ typedef struct processo_{
     char descricao[MAX_DESCR];// descricao do processo
 }processo;
 
-int prior_tempo, //indica se está ordenado por prioridade(0) ou horario de chegada(1) ou se está desordenado -após inserção(-1)
+int prior_tempo = -1, //indica se está ordenado por prioridade(0) ou horario de chegada(1) ou se está desordenado -após inserção(-1)
     tamanho = 0; //numero de processos na lista
 processo lista[TAM_MAX];//lista de processos
 
@@ -52,7 +52,71 @@ horario ler_horario(){
     return t;    
 }
 
-//adiciona um item no final da lista
+// troca a e b de "lugar"
+void swap(processo * a, processo *b){
+    processo aux = *a;
+    *a = *b;
+    *b = aux;
+}
+
+void quick_sort_prior(processo * lista, int inicio, int fim){
+    if(fim <= inicio)
+        return;
+
+    int pivo = lista[(inicio + fim)/2].prior, i, j;
+
+    // movendo o pivo para o final da lista.
+    swap(&lista[(inicio + fim)/2], &lista[fim]);
+
+    // particionamento do array (metodo de Lomuto).
+    for (i = inicio, j = inicio; i < fim; i++){
+        if(lista[i].prior < pivo)
+            swap(&lista[i], &lista[j++]);
+    }
+    swap(&lista[j], &lista[fim]); // j = posicao correta do elemento pivo.
+
+    //recursão
+    quick_sort_prior(lista, inicio, j - 1);
+    quick_sort_prior(lista, j + 1, fim);
+    
+}
+
+void quick_sort_horario(processo * lista, int inicio, int fim){
+    if(fim <= inicio)
+        return;
+
+    horario pivo = lista[(inicio + fim)/2].chegada;
+    int i, j;
+
+    // movendo o pivo para o final da lista.
+    swap(&lista[(inicio + fim)/2], &lista[fim]);
+
+    // particionamento do array (metodo de Lomuto).
+    for (i = inicio, j = inicio; i < fim; i++){
+        
+        if(lista[i].chegada.hh > pivo.hh){ //Comparação entre as horas
+            swap(&lista[i], &lista[j++]);
+        } else if(lista[i].chegada.hh == pivo.hh){ //Se as horas forem iguais, compara entre os minutos
+            if(lista[i].chegada.mm > pivo.mm){
+                swap(&lista[i], &lista[j++]);
+            }
+            else if(lista[i].chegada.mm == pivo.mm){ //Se horas e minutos forem iguais, compara entre os segundos
+                if(lista[i].chegada.ss > pivo.ss){
+                    swap(&lista[i], &lista[j++]);
+                }
+            }
+        }
+
+    }
+    swap(&lista[j], &lista[fim]); // j = posicao correta do elemento pivo.
+
+    //recursão
+    quick_sort_horario(lista, inicio, j - 1);
+    quick_sort_horario(lista, j + 1, fim);
+    
+}
+
+//adiciona um processo no final da lista
 void add(){
     if(tamanho >= TAM_MAX)
         return;// lista está cheia
@@ -69,9 +133,31 @@ void add(){
     prior_tempo = -1;
 }
 
+//executa o processo de maior prioridade ou o de menor tempo 
 void exec(){
-    printf("Exec!!!\n");
+    if(tamanho == 0)
+        return; //lista está vazia
+
+    char aux[3]; //string para leitura do comando (-p ou -t) que distingue entre maior prioridade ou menor tempo
+    scanf(" %s", aux);
+
+    if(strcmp(aux, "-p") == 0){ //Executa o de maior prioridade
+        if(prior_tempo != 0){ //Se nao esta ordenado por prioridade
+            quick_sort_prior(lista, 0, tamanho - 1); //Ordena por prioridade e faz prior_tempo = 0
+            prior_tempo = 0;
+        } 
+    } else if(strcmp(aux, "-t") == 0) //Executa o de menor tempo
+        if(prior_tempo != 1){ //Se nao esta ordenado por tempo
+            quick_sort_horario(lista, 0, tamanho - 1); //Ordena por horario de chegada e faz prior_tempo = 1
+            prior_tempo = 1;
+        }
+    
+    tamanho --;//Diminui o tamanho do vetor, excluindo o último processo da lista
 }
+
+// void exec(){
+//     printf("Exec!!!\n");
+//}
 void change(){
     printf("Change!!!\n");
 }
