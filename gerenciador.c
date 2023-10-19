@@ -27,6 +27,28 @@ processo lista[TAM_MAX];//lista de processos
 -add();
 */
 
+void quick_sort(processo * lista, int inicio, int fim){
+    if(fim <= inicio)
+        return;
+
+    int pivo = lista[(inicio + fim)/2], i, j;
+
+    // movendo o pivo para o final da lista.
+    swap(&lista[(inicio + fim)/2], &lista[fim]);
+
+    // particionamento do array (metodo de Lomuto).
+    for (i = inicio, j = inicio; i < fim; i++){
+        if(lista[i] < pivo)
+            swap(&lista[i], &lista[j++]);
+    }
+    swap(&lista[j], &lista[fim]); // j = posicao correta do elemento pivo.
+
+    //recursão
+    quick_sort(lista, inicio, j - 1);
+    quick_sort(lista, j + 1, fim);
+    
+}
+
 /* funções do Maicon e do Karl
 -exec();
 -change();
