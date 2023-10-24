@@ -20,6 +20,7 @@
 
 #define MAX_DESCR 50 //maximo de caracteres de uma descricao
 #define TAM_MAX 100 //numero maximo de processos de uma lista
+#define ERRO -1412412 //Erro que representado por um inteiro
 
 //struct que guarda um horario no formato horas:minutos:segundos
 typedef struct horario_{
@@ -80,6 +81,70 @@ void quick_sort_prior(processo * lista, int inicio, int fim){
     quick_sort_prior(lista, j + 1, fim);
     
 }
+
+int busca_elementos_prioridade(int prioridade){
+        for(int i = tamanho-1; i>=0; i--){
+            if(lista[i].prior == prioridade){
+                return i;
+            }
+        }
+        return ERRO;
+}
+
+int busca_elementos_horario(horario time){
+        for(int i = tamanho-1; i>=0; i--){
+            if((lista[i].chegada.hh == time.hh) && (lista[i].chegada.mm == time.mm) && (lista[i].chegada.ss == time.ss)){
+                return i;
+            }
+        }
+        return ERRO;
+}
+
+int lista_busca_binária_prioridade(int x) {
+    int j, k; //J é o valor que tem na primeira posicao do meu vetor, k é o valor que tem na ultima posicao do meu vetor
+    int inicio_temp = 0; //Limite Inferior da busca binaria
+    int fim_temp = tamanho-1; //Limite Superior da busca binaria
+    while(inicio_temp<=fim_temp){
+        k = (inicio_temp+fim_temp) / 2; //k representa o meio da lista
+        j = lista[k].prior; //j é quem está nessa posicao(meio da lista);
+        if(j==x){ //Aqui é o proprio x
+            return (k);
+        }else if(j<x){ //Já que x é maior, ele está desse meio para frente
+            inicio_temp=k+1;
+        }else{ 
+            fim_temp=k; ///Se x for menor, ele está desse meio para tras
+        }
+    }
+    return(ERRO);
+} 
+
+int lista_busca_binária_tempo(horario x) {
+    int k;
+    horario j;
+    int inicio_temp = tamanho-1; //Limite Inferior da busca binaria
+    int fim_temp = 0; //Limite Superior da busca binaria
+    while(inicio_temp>=fim_temp){
+        k = (inicio_temp+fim_temp) / 2; //k representa o meio da lista
+        j = lista[k].chegada; //j é quem está nessa posicao(meio da lista);
+        if((j.hh==x.hh) && (j.mm==x.mm) && (j.ss==x.ss)){ //Aqui é o proprio x
+            return (k);
+        }else if(j.hh < x.hh){ //Já que x é maior, ele está desse meio para tras
+            inicio_temp=k;
+        }else if(j.hh == x.hh){
+            if(j.mm < x.mm){
+                inicio_temp=k;
+            }else if(j.mm == x.mm){
+                if(j.ss < x.ss){
+                inicio_temp=k;
+                }
+            }
+        }else{ 
+            fim_temp=k; ///Se x for menor, ele está desse meio para frente
+        }
+    }
+    return(ERRO);
+}
+
 
 void quick_sort_horario(processo * lista, int inicio, int fim){
     if(fim <= inicio)
@@ -155,12 +220,40 @@ void exec(){
     tamanho --;//Diminui o tamanho do vetor, excluindo o último processo da lista
 }
 
-// void exec(){
-//     printf("Exec!!!\n");
-//}
+//altera um processo quando recebe seu horario de chegada ou sua prioridade.
 void change(){
-    printf("Change!!!\n");
+    char comando[3]; //le se a alteracao ocorrerá por tempo ou prioridade
+    scanf(" %s", comando);
+    if(strcmp(comando, "-t") == 0){
+        horario anterior; //horario do processo anterior
+        horario novo; //horario do processo novo
+        int posicao; //posicao do vetor que ele está
+        anterior = ler_horario();
+        getchar(); //para nao pegar o caracter '|'
+        novo = ler_horario();
+        if(prior_tempo == 1){ //Se a lista já está ordenada realizo busca binária
+            posicao = lista_busca_binária_tempo(anterior);
+        }else{ //Se não faço uma busca convencional
+            posicao = busca_elementos_horario(anterior);
+        }
+        lista[posicao].chegada = novo;
+        prior_tempo = -1; //indica que a partir de agora a lista não está ordenada
+    }
+    if(strcmp(comando, "-p") == 0){
+        int prioridade_anterior, prioridade_nova, posicao; //Prioridade anterior, Prioridade nova, Posicao do vetor que ele está
+        scanf("%d", &prioridade_anterior);
+        getchar();  //para nao pegar o caracter '|'
+        scanf("%d", &prioridade_nova);
+        if(prior_tempo == 0){ //Se a lista já está ordenada realizo busca binária
+            posicao = lista_busca_binária_prioridade(prioridade_anterior);
+        }else{ //Se não faço uma busca convencional
+            posicao = busca_elementos_prioridade(prioridade_anterior);
+        }
+        lista[posicao].prior = prioridade_nova;
+        prior_tempo = -1;  //indica que a partir de agora a lista não está ordenada
+    }
 }
+
 void print(){
     printf("Print!!!\n");
 }
@@ -187,13 +280,14 @@ void ler_comando(){
 
     else if(strcmp(comando, "next") == 0)
         next(); //chama next
-        
+
     else if(strcmp(comando, "quit") == 0)
         return;
-
+    
     ler_comando(); // recursão - leitura de comandos continua até comando quit
 }
 
 int main(void){
-    ler_comando();    
+    ler_comando();   
+    return 0;
 }
