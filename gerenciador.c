@@ -255,7 +255,50 @@ void change(){
 }
 
 void print(){
-    printf("Print!!!\n");
+    char c[3];
+    if(tamanho==0){
+        return; //lista está vazia
+    }
+    scanf(" %s", c);// ler o comando
+
+    if(strcmp(c,"-p")==0){//comando para printar todos os processos em ordem decrescente de prioridade
+        if(prior_tempo==0){// está ordenado em ordem de prioridade
+            for (int i = tamanho-1; i >= 0; i--)//percorre o vetor printando todos os processos
+            {
+                printf("%d %02d:%02d:%02d %s\n",lista[i].prior, lista[i].chegada.hh, lista[i].chegada.mm, lista[i].chegada.ss, lista[i].descricao );    
+            }
+            
+        }
+        else{
+            quick_sort_prior(lista, 0, tamanho-1);//se não estiver ordenado, ordena em ordem de prioridade
+            for (int i = tamanho-1; i >= 0; i--)
+            {
+                printf("%d %02d:%02d:%02d %s\n",lista[i].prior, lista[i].chegada.hh, lista[i].chegada.mm, lista[i].chegada.ss, lista[i].descricao );
+            }
+            
+        }
+
+    }
+
+    if(strcmp(c,"-t")==0){//comando para printar todos os processos em ordem crescente de horário
+        if(prior_tempo==1){//está ordenado em ordem de horário
+            for (int i = tamanho-1; i >= 0; i--)//percorre o vetor printando todos os processos
+            {
+                printf("%d %02d:%02d:%02d %s\n",lista[i].prior, lista[i].chegada.hh, lista[i].chegada.mm, lista[i].chegada.ss, lista[i].descricao );
+            }
+            
+        }
+        else{//se não estiver ordenado, ordena em ordem de horário
+            quick_sort_horario(lista,0, tamanho-1);
+            for (int i = tamanho-1; i >= 0; i--)
+            {
+                printf("%d %02d:%02d:%02d %s\n",lista[i].prior, lista[i].chegada.hh, lista[i].chegada.mm, lista[i].chegada.ss, lista[i].descricao );
+            }
+            
+        }
+
+    }
+
 }
 void next(){
     printf("Next!!!\n");
