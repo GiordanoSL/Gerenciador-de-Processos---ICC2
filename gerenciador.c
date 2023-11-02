@@ -254,55 +254,74 @@ void change(){
     }
 }
 
-void print(){
+void print() {
     char c[3];
-    if(tamanho==0){
-        return; //lista está vazia
+    if (tamanho == 0) {
+        return; // lista está vazia
     }
-    scanf(" %s", c);// ler o comando
+    scanf(" %s", c); // ler o comando
 
-    if(strcmp(c,"-p")==0){//comando para printar todos os processos em ordem decrescente de prioridade
-        if(prior_tempo==0){// está ordenado em ordem de prioridade
-            for (int i = tamanho-1; i >= 0; i--)//percorre o vetor printando todos os processos
-            {
-                printf("%d %02d:%02d:%02d %s\n",lista[i].prior, lista[i].chegada.hh, lista[i].chegada.mm, lista[i].chegada.ss, lista[i].descricao );    
-            }
-            
+    if (strcmp(c, "-p") == 0) { // comando para printar todos os processos em ordem decrescente de prioridade
+        if (prior_tempo != 0) { // não está ordenado em ordem de prioridade
+            quick_sort_prior(lista, 0, tamanho - 1); // Ordena por prioridade
+            prior_tempo = 0;
         }
-        else{
-            quick_sort_prior(lista, 0, tamanho-1);//se não estiver ordenado, ordena em ordem de prioridade
-            for (int i = tamanho-1; i >= 0; i--)
-            {
-                printf("%d %02d:%02d:%02d %s\n",lista[i].prior, lista[i].chegada.hh, lista[i].chegada.mm, lista[i].chegada.ss, lista[i].descricao );
-            }
-            
+    } else if (strcmp(c, "-t") == 0) { // comando para printar todos os processos em ordem crescente de horário
+        if (prior_tempo != 1) { // não está ordenado em ordem de horário
+            quick_sort_horario(lista, 0, tamanho - 1); // Ordena por horário de chegada
+            prior_tempo = 1;
         }
-
     }
 
-    if(strcmp(c,"-t")==0){//comando para printar todos os processos em ordem crescente de horário
-        if(prior_tempo==1){//está ordenado em ordem de horário
-            for (int i = tamanho-1; i >= 0; i--)//percorre o vetor printando todos os processos
-            {
-                printf("%d %02d:%02d:%02d %s\n",lista[i].prior, lista[i].chegada.hh, lista[i].chegada.mm, lista[i].chegada.ss, lista[i].descricao );
-            }
-            
+    // Agora, percorra a lista da primeira à última posição e imprima os processos em ordem crescente de prioridade ou ordem crescente de horário de chegada.
+    if (strcmp(c, "-p") == 0) {
+        for (int i = tamanho-1; i >= 0; i--) {
+            printf("%02d %02d:%02d:%02d %s\n", lista[i].prior, lista[i].chegada.hh, lista[i].chegada.mm, lista[i].chegada.ss, lista[i].descricao);
         }
-        else{//se não estiver ordenado, ordena em ordem de horário
-            quick_sort_horario(lista,0, tamanho-1);
-            for (int i = tamanho-1; i >= 0; i--)
-            {
-                printf("%d %02d:%02d:%02d %s\n",lista[i].prior, lista[i].chegada.hh, lista[i].chegada.mm, lista[i].chegada.ss, lista[i].descricao );
-            }
-            
+        printf("\n"); // Linha em branco no final
+    } else if (strcmp(c, "-t") == 0) {
+        for (int i = tamanho-1; i >= 0; i--) {
+            printf("%02d %02d:%02d:%02d %s\n", lista[i].prior, lista[i].chegada.hh, lista[i].chegada.mm, lista[i].chegada.ss, lista[i].descricao);
         }
-
     }
 
+    
 }
+
+
+
+
 void next(){
-    printf("Next!!!\n");
+    char opcao[3];
+    scanf(" %s", opcao); // Ler a opção (-p ou -t)
+
+    int index; // Índice do processo a ser exibido
+
+    if (strcmp(opcao, "-p") == 0) {
+        // Encontrar o processo com a maior prioridade
+        if (prior_tempo != 0) {
+            quick_sort_prior(lista, 0, tamanho - 1);
+            prior_tempo = 0;
+        }
+        index = tamanho - 1;
+    } else if (strcmp(opcao, "-t") == 0) {
+        // Encontrar o processo com o menor horário de chegada
+        if (prior_tempo != 1) {
+            quick_sort_horario(lista, 0, tamanho - 1);
+            prior_tempo = 1;
+        }
+        index = tamanho - 1;
+    } else {
+        return; // Opção inválida, não faz nada
+    }
+
+    if (index >= 0) {
+        // Exibir as informações do processo encontrado
+        printf("%02d %02d:%02d:%02d %s\n", lista[index].prior, lista[index].chegada.hh, lista[index].chegada.mm, lista[index].chegada.ss, lista[index].descricao);
+    }
+    printf("\n"); // Linha em branco no final
 }
+
 
 void ler_comando(){
     char comando[7];
